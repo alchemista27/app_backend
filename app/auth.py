@@ -9,7 +9,8 @@ from . import models, schemas, database
 SECRET_KEY = "secret123"  # ganti di production
 ALGORITHM = "HS256"
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/api/v1", 
+                   tags=["auth"])
 
 def create_token(data: dict):
     to_encode = data.copy()
