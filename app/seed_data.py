@@ -1,6 +1,11 @@
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-import models
+# Handle import fleksibel
+try:
+    from . import models
+    from .database import SessionLocal, engine
+except ImportError:
+    import models
+    from database import SessionLocal, engine
 
 # Hapus tabel lama dan buat baru
 models.Base.metadata.drop_all(bind=engine)
