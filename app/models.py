@@ -58,3 +58,15 @@ class Lesson(Base):
     topic_id = Column(Integer, ForeignKey("topics.id"))
 
     topic = relationship("Topic", back_populates="lessons")
+
+class LessonProgress(Base):
+    __tablename__ = "lesson_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    lesson_id = Column(Integer, ForeignKey("lessons.id"))
+    is_complete = Column(Boolean, default=False)
+
+    user = relationship("User")
+    lesson = relationship("Lesson")
+

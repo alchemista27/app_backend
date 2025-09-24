@@ -41,3 +41,18 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+class LessonProgressSchema(BaseModel):
+    user_id: int
+    lesson_id: int
+    is_complete: bool
+
+    class Config:
+        orm_mode = True
+
+class CourseProgressSummary(BaseModel):
+    course_id: int
+    course_title: str
+    total_lessons: int
+    completed_lessons: int
+    progress_percentage: float
