@@ -1,20 +1,28 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from passlib.hash import bcrypt
-from jose import jwt
+from passlib.context import CryptContext
+from jose import JWTError, jwt
 from datetime import datetime, timedelta
-
-from . import models, schemas, database
+from . import database, models, schemas
 
 SECRET_KEY = "secret123"  # ganti di production
 ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 router = APIRouter(prefix="/api/v1", 
                    tags=["auth"])
 
-def create_token(data: dict):
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password: str):
+    return pwd_context.hash(password)
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_token(data: dict, expires_delta:timedelta | None = None):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(hours=24)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
