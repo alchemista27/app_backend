@@ -1,72 +1,52 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, Float, DateTime, func
 from sqlalchemy.orm import relationship
-
-# Handle import fleksibel
-try:
-    from .database import Base
-except ImportError:
-    from database import Base
-
+from app.database import Base
 
 class User(Base):
     __tablename__ = "users"
-
     id = Column(Integer, primary_key=True, index=True)
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     username = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)
-    token = Column(String, nullable=True)
+    password = Column(String, nullable=False)  # hashed password
 
+    enrolled_courses = relationship("EnrolledCourse", back_populates="user")
 
 class Course(Base):
     __tablename__ = "courses"
-
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    thumbnail = Column(String, nullable=True)
-    sale_price = Column(Integer, nullable=True)
-    regular_price = Column(Integer, nullable=False)
-    author = Column(String, nullable=False)
-    rating = Column(Integer, nullable=True)
-    promo_video = Column(String, nullable=True)
+    title = Column(String, index=True)
+    description = Column(Text)
 
-    topics = relationship("Topic", back_populates="course", cascade="all, delete-orphan")
+    materials = relationship("Material", back_populates="course")
+    enrolled_courses = relationship("EnrolledCourse", back_populates="course")
 
-
-class Topic(Base):
-    __tablename__ = "topics"
-
+class Material(Base):
+    __tablename__ = "materials"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    total_duration = Column(String, nullable=True)
-    total_lesson = Column(Integer, nullable=True)
+    title = Column(String)
+    content = Column(Text)
     course_id = Column(Integer, ForeignKey("courses.id"))
 
-    course = relationship("Course", back_populates="topics")
-    lessons = relationship("Lesson", back_populates="topic", cascade="all, delete-orphan")
+    course = relationship("Course", back_populates="materials")
 
-
-class Lesson(Base):
-    __tablename__ = "lessons"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    lesson_url = Column(Text, nullable=False)
-    duration = Column(String, nullable=True)
-    is_complete = Column(Boolean, default=False)
-    topic_id = Column(Integer, ForeignKey("topics.id"))
-
-    topic = relationship("Topic", back_populates="lessons")
-
-class LessonProgress(Base):
-    __tablename__ = "lesson_progress"
-
+class EnrolledCourse(Base):
+    __tablename__ = "enrolled_courses"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    lesson_id = Column(Integer, ForeignKey("lessons.id"))
-    is_complete = Column(Boolean, default=False)
+    course_id = Column(Integer, ForeignKey("courses.id"))
+    rating = Column(Integer, nullable=True)
+    review = Column(Text, nullable=True)
 
-    user = relationship("User")
-    lesson = relationship("Lesson")
+    user = relationship("User", back_populates="enrolled_courses")
+    course = relationship("Course", back_populates="enrolled_courses")
+    progresses = relationship("Progress", back_populates="enrolled_course")
 
+class Progress(Base):
+    __tablename__ = "progress"
+    id = Column(Integer, primary_key=True, index=True)
+    enrolled_course_id = Column(Integer, ForeignKey("enrolled_courses.id"))
+    material_id = Column(Integer, ForeignKey("materials.id"))
+    completed_at = Column(DateTime, default=func.now())
+
+    enrolled_course = relationship("EnrolledCourse", back_populates="progresses")
