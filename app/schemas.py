@@ -1,46 +1,91 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import List, Optional
+from datetime import datetime
 
+# ---------------------------
+# User Schemas
+# ---------------------------
 class UserBase(BaseModel):
-    full_name: str
     email: str
-    username: str
+    full_name: Optional[str] = None
+    specialization_id: Optional[int] = None
 
 class UserCreate(UserBase):
     password: str
 
 class UserResponse(UserBase):
     id: int
+    created_at: datetime
+    updated_at: datetime
+
     class Config:
         orm_mode = True
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
+# ---------------------------
+# Course Schemas
+# ---------------------------
 class CourseBase(BaseModel):
-    title: str
-    description: str
+    name: str
+    description: Optional[str] = None
 
-class CourseOut(CourseBase):
+class CourseResponse(CourseBase):
     id: int
+    created_at: datetime
+    updated_at: datetime
+
     class Config:
         orm_mode = True
 
-class MaterialOut(BaseModel):
+# ---------------------------
+# Category Schemas
+# ---------------------------
+class CategoryBase(BaseModel):
+    name: str
+
+class CategoryResponse(CategoryBase):
     id: int
-    title: str
-    content: str
+    created_at: datetime
+    updated_at: datetime
+
     class Config:
         orm_mode = True
 
-class EnrollRequest(BaseModel):
+# ---------------------------
+# FAQ Schemas
+# ---------------------------
+class FAQBase(BaseModel):
+    question: str
+    answer: str
+
+class FAQResponse(FAQBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+# ---------------------------
+# EnrolledCourse Schemas
+# ---------------------------
+class EnrolledCourseBase(BaseModel):
     user_id: int
     course_id: int
+    progress: int = 0
 
-class ReviewRequest(BaseModel):
-    rating: int
-    review: str
+class EnrolledCourseResponse(EnrolledCourseBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    user: Optional[UserResponse] = None
+    course: Optional[CourseResponse] = None
 
-class ProgressRequest(BaseModel):
-    material_id: int
+    class Config:
+        orm_mode = True
+
+# ---------------------------
+# Token Schema (Auth)
+# ---------------------------
+class Token(BaseModel):
+    access_token: str
+    token_type: str

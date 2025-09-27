@@ -1,52 +1,68 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, Float, DateTime, func
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
+import datetime
 
+# ---------------------------
+# User
+# ---------------------------
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    username = Column(String, unique=True, index=True, nullable=False)
-    password = Column(String, nullable=False)  # hashed password
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+    full_name = Column(String, nullable=True)
+    specialization_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    enrolled_courses = relationship("EnrolledCourse", back_populates="user")
+    enrolled_courses = relationship("EnrolledCourse", back_populates="user", cascade="all, delete")
 
+# ---------------------------
+# Course
+# ---------------------------
 class Course(Base):
     __tablename__ = "courses"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(Text)
+    name = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    materials = relationship("Material", back_populates="course")
-    enrolled_courses = relationship("EnrolledCourse", back_populates="course")
+    enrolled_courses = relationship("EnrolledCourse", back_populates="course", cascade="all, delete")
 
-class Material(Base):
-    __tablename__ = "materials"
+# ---------------------------
+# Category
+# ---------------------------
+class Category(Base):
+    __tablename__ = "categories"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    content = Column(Text)
-    course_id = Column(Integer, ForeignKey("courses.id"))
+    name = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    course = relationship("Course", back_populates="materials")
+# ---------------------------
+# FAQ
+# ---------------------------
+class FAQ(Base):
+    __tablename__ = "faqs"
+    id = Column(Integer, primary_key=True, index=True)
+    question = Column(String, nullable=False)
+    answer = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
+# ---------------------------
+# EnrolledCourse
+# ---------------------------
 class EnrolledCourse(Base):
     __tablename__ = "enrolled_courses"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     course_id = Column(Integer, ForeignKey("courses.id"))
-    rating = Column(Integer, nullable=True)
-    review = Column(Text, nullable=True)
+    progress = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="enrolled_courses")
     course = relationship("Course", back_populates="enrolled_courses")
-    progresses = relationship("Progress", back_populates="enrolled_course")
-
-class Progress(Base):
-    __tablename__ = "progress"
-    id = Column(Integer, primary_key=True, index=True)
-    enrolled_course_id = Column(Integer, ForeignKey("enrolled_courses.id"))
-    material_id = Column(Integer, ForeignKey("materials.id"))
-    completed_at = Column(DateTime, default=func.now())
-
-    enrolled_course = relationship("EnrolledCourse", back_populates="progresses")
