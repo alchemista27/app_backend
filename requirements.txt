@@ -1,11 +1,14 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
-databases
 pydantic
-python-jose
 passlib[bcrypt]
+python-jose
 python-multipart
 aiofiles
 python-dotenv
-uvicorn
+jinja2
+reportlab
+pdf2image
+pillow
+PyPDF2
