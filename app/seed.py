@@ -43,7 +43,7 @@ def seed_data():
     # --- Courses ---
     courses = [
         models.Course(
-            title="Intro to Python",
+            name="Intro to Python",
             description="Learn Python from scratch",
             category_id=2,
             created_at=datetime.datetime.utcnow(),
