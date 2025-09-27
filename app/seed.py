@@ -49,7 +49,7 @@ def seed_data():
             created_at=datetime.datetime.utcnow(),
         ),
         models.Course(
-            title="Flutter Mobile Development",
+            name="Flutter Mobile Development",
             description="Build apps with Flutter",
             category_id=3,
             created_at=datetime.datetime.utcnow(),
