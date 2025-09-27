@@ -1,11 +1,8 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
 import datetime
 
-# ---------------------------
-# User
-# ---------------------------
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -16,45 +13,30 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    enrolled_courses = relationship("EnrolledCourse", back_populates="user", cascade="all, delete")
+    enrolled_courses = relationship("EnrolledCourse", back_populates="user")
 
-# ---------------------------
-# Course
-# ---------------------------
 class Course(Base):
     __tablename__ = "courses"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    description = Column(Text, nullable=True)
+    description = Column(String, nullable=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    enrolled_courses = relationship("EnrolledCourse", back_populates="course", cascade="all, delete")
+    enrolled_courses = relationship("EnrolledCourse", back_populates="course")
 
-# ---------------------------
-# Category
-# ---------------------------
 class Category(Base):
     __tablename__ = "categories"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-# ---------------------------
-# FAQ
-# ---------------------------
 class FAQ(Base):
     __tablename__ = "faqs"
     id = Column(Integer, primary_key=True, index=True)
     question = Column(String, nullable=False)
-    answer = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    answer = Column(String, nullable=False)
 
-# ---------------------------
-# EnrolledCourse
-# ---------------------------
 class EnrolledCourse(Base):
     __tablename__ = "enrolled_courses"
     id = Column(Integer, primary_key=True, index=True)

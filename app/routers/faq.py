@@ -5,7 +5,7 @@ from app import models, schemas
 
 router = APIRouter(prefix="/faq", tags=["faq"])
 
-
 @router.get("/", response_model=list[schemas.FAQResponse])
-def get_all_faq(db: Session = Depends(get_db)):
-    return db.query(models.FAQ).all()
+def fetch_all_faq(db: Session = Depends(get_db)):
+    faqs = db.query(models.FAQ).all()
+    return faqs

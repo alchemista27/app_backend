@@ -1,48 +1,21 @@
-import 'package:dio/dio.dart';
-import 'package:edutiv/model/profile/user_model.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-import '../model/auth/auth_model.dart';
+SQLALCHEMY_DATABASE_URL = "sqlite:///./edutiv.db"
 
-class AuthAPI {
-  String baseUrl = 'https://edutiv-capstone.herokuapp.com';
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
 
-  Future<TokenModel> login(String email, String password) async {
-    try {
-      EasyLoading.show(status: 'Loading...');
-      Response response = await Dio().post(
-        baseUrl + '/user/login',
-        data: {
-          'email': email,
-          'password': password,
-        },
-      );
-      if (response.statusCode == 200) {
-        EasyLoading.dismiss();
-        return TokenModel.fromJson(response.data);
-      } else {
-        throw Exception('Data Not Available');
-      }
-    } catch (e) {
-      print(e);
-      throw EasyLoading.showError('Failed to Login!');
-    }
-  }
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-  Future<UserModel> getWhoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? token = prefs.getString('token');
-    Response response = await Dio().get(
-      baseUrl + '/user',
-      options: Options(
-        headers: {'Authorization': 'Bearer $token'},
-      ),
-    );
-    if (response.statusCode == 200) {
-      return UserModel.fromJson(response.data['data']);
-    } else {
-      throw Exception('Data Not Available');
-    }
-  }
-}
+Base = declarative_base()
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

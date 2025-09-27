@@ -1,10 +1,13 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 
-# ---------------------------
-# User Schemas
-# ---------------------------
+# Token
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+# User
 class UserBase(BaseModel):
     email: str
     full_name: Optional[str] = None
@@ -21,12 +24,11 @@ class UserResponse(UserBase):
     class Config:
         orm_mode = True
 
-# ---------------------------
-# Course Schemas
-# ---------------------------
+# Course
 class CourseBase(BaseModel):
     name: str
     description: Optional[str] = None
+    category_id: Optional[int] = None
 
 class CourseResponse(CourseBase):
     id: int
@@ -36,56 +38,31 @@ class CourseResponse(CourseBase):
     class Config:
         orm_mode = True
 
-# ---------------------------
-# Category Schemas
-# ---------------------------
-class CategoryBase(BaseModel):
-    name: str
-
-class CategoryResponse(CategoryBase):
+# Category
+class CategoryResponse(BaseModel):
     id: int
-    created_at: datetime
-    updated_at: datetime
+    name: str
 
     class Config:
         orm_mode = True
 
-# ---------------------------
-# FAQ Schemas
-# ---------------------------
-class FAQBase(BaseModel):
+# FAQ
+class FAQResponse(BaseModel):
+    id: int
     question: str
     answer: str
 
-class FAQResponse(FAQBase):
-    id: int
-    created_at: datetime
-    updated_at: datetime
-
     class Config:
         orm_mode = True
 
-# ---------------------------
-# EnrolledCourse Schemas
-# ---------------------------
-class EnrolledCourseBase(BaseModel):
+# EnrolledCourse
+class EnrolledCourseResponse(BaseModel):
+    id: int
     user_id: int
     course_id: int
-    progress: int = 0
-
-class EnrolledCourseResponse(EnrolledCourseBase):
-    id: int
+    progress: int
     created_at: datetime
     updated_at: datetime
-    user: Optional[UserResponse] = None
-    course: Optional[CourseResponse] = None
 
     class Config:
         orm_mode = True
-
-# ---------------------------
-# Token Schema (Auth)
-# ---------------------------
-class Token(BaseModel):
-    access_token: str
-    token_type: str

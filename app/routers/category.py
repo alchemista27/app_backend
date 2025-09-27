@@ -5,7 +5,7 @@ from app import models, schemas
 
 router = APIRouter(prefix="/category", tags=["category"])
 
-
 @router.get("/", response_model=list[schemas.CategoryResponse])
-def get_all_category(db: Session = Depends(get_db)):
-    return db.query(models.Category).all()
+def fetch_all_categories(db: Session = Depends(get_db)):
+    categories = db.query(models.Category).all()
+    return categories
