@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from .database import SessionLocal, Base, engine
-from . import models
+from app.database import SessionLocal, Base, engine
+from app import models
 from passlib.context import CryptContext
 import datetime
 
